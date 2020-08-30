@@ -1119,7 +1119,7 @@ export const MapEngine = function(config) {
     }
   };
 
-  var ejectCoordFromEvent = function(e) {
+  var extractCoordFromEvent = function(e) {
     switch (config.mapVendor) {
       case MapVendor.Yandex:
         return e.get("coords");
@@ -1131,7 +1131,7 @@ export const MapEngine = function(config) {
     }
   }
 
-  var ejectCoordFromGeoObject = function(obj) {
+  var extractCoordFromGeoObject = function(obj) {
     switch (config.mapVendor) {
       case MapVendor.Yandex:
         return obj.geometry.getCoordinates()[0];
@@ -1144,13 +1144,13 @@ export const MapEngine = function(config) {
     }
   }
 
-  var ejectCoordFromString = function(s) {
+  var extractCoordFromString = function(s) {
     let scoord = s.split(',');
     let coord = [parseFloat(scoord[0]),parseFloat(scoord[1])];
     return (isNaN(coord[0])||isNaN(coord[1]))?null:coord;
   }
 
-  var ejectFullAddress = function(geo) {
+  var extractFullAddress = function(geo) {
     switch (config.mapVendor) {
       case MapVendor.Yandex:
         return geo.GeoObjectCollection.featureMember[0].GeoObject.metaDataProperty.GeocoderMetaData.text;
@@ -1161,7 +1161,7 @@ export const MapEngine = function(config) {
     }
   }
 
-  var ejectNearestPlace = function(geo) {
+  var extractNearestPlace = function(geo) {
     switch (config.mapVendor) {
       case MapVendor.Yandex:
         var coord = geo.GeoObjectCollection
@@ -1179,7 +1179,7 @@ export const MapEngine = function(config) {
     }
   }
 
-  var ejectCluster = function(event) {
+  var extractCluster = function(event) {
     switch (config.mapVendor) {
       case MapVendor.Yandex:
         return new CommonCluster(event.get('target'));
@@ -2037,12 +2037,12 @@ export const MapEngine = function(config) {
     ready: ready,
     newMap: newMap,
     newBalloon: newBalloon,
-    ejectCoordFromEvent: ejectCoordFromEvent,
-    ejectCoordFromGeoObject: ejectCoordFromGeoObject,
-    ejectCoordFromString: ejectCoordFromString,
-    ejectFullAddress: ejectFullAddress,
-    ejectNearestPlace: ejectNearestPlace,
-    ejectCluster: ejectCluster,
+    extractCoordFromEvent: extractCoordFromEvent,
+    extractCoordFromGeoObject: extractCoordFromGeoObject,
+    extractCoordFromString: extractCoordFromString,
+    extractFullAddress: extractFullAddress,
+    extractNearestPlace: extractNearestPlace,
+    extractCluster: extractCluster,
     geocode: geocode,
     preventDefault: preventDefault,
     boundsFromPoints: boundsFromPoints,

@@ -30,7 +30,7 @@ const App = () => {
                           }}
                           onClick={(event,engine,map)=>{
                             map.removeAllMarkers();
-                            let coords = engine.ejectCoordFromEvent(event);
+                            let coords = engine.extractCoordFromEvent(event);
                             console.log("click",coords);
                             map.addMarker(coords);
                           }}
