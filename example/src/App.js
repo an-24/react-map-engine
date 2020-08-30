@@ -18,7 +18,7 @@ const App = () => {
                   setBounds([[58.07115817984001, 55.999219024658224],[57.93007793541389, 56.42356594848632]]);
                 }}>Set Bounds</button>
                 <span style={{marginLeft:40}}>Zoom: <input onChange={(event)=>{
-                  setZoom(event.target.value);
+                  setZoom(parseInt(event.target.value));
                 }}/>
                 </span>
                 <span style={{marginLeft:40}}>Vendor:

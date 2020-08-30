@@ -62,7 +62,7 @@ export const MapComponent = (props) => {
     state.map.setBounds(props.bounds);
   }
   if(props.center && state.engine) {
-    let coord = state.engine.ejectCoordFromString(props.center);
+    let coord = state.engine.extractCoordFromString(props.center);
     if(coord) {
       state.map.setCenter(coord);
     }

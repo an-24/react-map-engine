@@ -1016,10 +1016,12 @@ export const MapEngine = function(config) {
   }
 
   var convertIconYToG = function(yicon) {
-    return {
-      url: yicon.iconImageHref,
-      size: yicon.iconImageSize?new google.maps.Size(yicon.iconImageSize[0], yicon.iconImageSize[1]):undefined,
-      anchor: yicon.iconImageOffset?new google.maps.Point(-yicon.iconImageOffset[0], -yicon.iconImageOffset[1]):undefined
+    if(yicon.iconImageHref) {
+      return {
+        url: yicon.iconImageHref,
+        size: yicon.iconImageSize?new google.maps.Size(yicon.iconImageSize[0], yicon.iconImageSize[1]):undefined,
+        anchor: yicon.iconImageOffset?new google.maps.Point(-yicon.iconImageOffset[0], -yicon.iconImageOffset[1]):undefined
+      }
     }
   }
 
