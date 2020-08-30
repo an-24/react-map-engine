@@ -20,11 +20,8 @@ export const MapComponent = (props) => {
   const ref = React.createRef();
   const dictonary = props.dictonary || Dictonary[lang];
 
-  const [state,SetState]=React.useState(()=>{
-    loadLibrary(MapScriptSrc(vendor,{lang:lang,apiKey:props.apiKeys[vendor]}),()=>{
-      if(vendor==MapVendor.Google) {
-        loadLibrary("https://unpkg.com/@google/markerclustererplus@4.0.1/dist/markerclustererplus.min.js");
-      }
+  const initVendorLibrary = ()=>{
+    const initEngine=()=>{
       MapEngine({mapVendor:vendor}).ready((engine)=>{
         $(ref.current).find("#loading").remove();
         const $map = $(ref.current).find("#"+idMap);
@@ -41,9 +38,23 @@ export const MapComponent = (props) => {
         markers.map(m=>{
           map.addMarker(m.coords,m.props);
         })
-        SetState({engine:engine,map:map});
+        SetState({engine:engine,map:map,vendor:vendor});
       })
+    }
+
+    loadLibrary(MapScriptSrc(vendor,{lang:lang,apiKey:props.apiKeys[vendor]}),()=>{
+      if(vendor==MapVendor.Google) {
+        loadLibrary("https://unpkg.com/@google/markerclustererplus@5.1.0/dist/markerclustererplus.min.js",()=>{
+          initEngine();
+        });
+      } else {
+        initEngine();
+      }
     });
+  }
+
+  const [state,SetState]=React.useState(()=>{
+    initVendorLibrary();
     return {}
   })
 
@@ -59,7 +70,10 @@ export const MapComponent = (props) => {
   if(props.zoom && state.engine) {
     state.map.setZoom(props.zoom);
   }
-
+  // refresh all if vendor change
+  if(state.vendor && vendor!=state.vendor) {
+    initVendorLibrary();
+  }
 
   return <div ref={ref} style={props.style}
               className={styles.root}>

@@ -583,7 +583,8 @@ export const MapEngine = function(config) {
         case MapVendor.Google:
           if (!this.markCollection) {
             this.markCollection = new MarkerClusterer(map, [], {
-              zoomOnClick: false
+              zoomOnClick: false,
+              imagePath: 'https://unpkg.com/@google/markerclustererplus@5.1.0/images/m'
             });
           }
           break;
@@ -1017,8 +1018,8 @@ export const MapEngine = function(config) {
   var convertIconYToG = function(yicon) {
     return {
       url: yicon.iconImageHref,
-      size: new google.maps.Size(yicon.iconImageSize[0], yicon.iconImageSize[1]),
-      anchor: new google.maps.Point(-yicon.iconImageOffset[0], -yicon.iconImageOffset[1])
+      size: yicon.iconImageSize?new google.maps.Size(yicon.iconImageSize[0], yicon.iconImageSize[1]):undefined,
+      anchor: yicon.iconImageOffset?new google.maps.Point(-yicon.iconImageOffset[0], -yicon.iconImageOffset[1]):undefined
     }
   }
 
@@ -1300,8 +1301,7 @@ export const MapEngine = function(config) {
         return cmap;
       }
       case MapVendor.Google: {
-        MarkerClusterer.prototype.MARKER_CLUSTER_IMAGE_PATH_ = config.staticUrl +
-          "/lib/node_modules/js-marker-clusterer/images/m";
+        //MarkerClusterer.prototype.MARKER_CLUSTER_IMAGE_PATH_ = "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m";
         let map = new google.maps.Map(document.getElementById(elemName),
           convertOptYToG(options));
         return new CommonMap(map, elemName);

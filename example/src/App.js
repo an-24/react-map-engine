@@ -8,6 +8,7 @@ const App = () => {
   const [center,setCenter] = React.useState(null);
   const [bounds,setBounds] = React.useState(null);
   const [zoom,setZoom] = React.useState(null);
+  const [vendor,setVendor] = React.useState(MapViewVendor.Yandex);
 
   return  <div style={{padding:40}}>
                 Coords: <input onChange={(event)=>{
@@ -20,12 +21,21 @@ const App = () => {
                   setZoom(event.target.value);
                 }}/>
                 </span>
+                <span style={{marginLeft:40}}>Vendor:
+                <select onChange={(event)=>{
+                          setVendor(parseInt(event.target.value));
+                        }}>
+                  <option value={MapViewVendor.Yandex}>Yandex</option>
+                  <option value={MapViewVendor.Google}>Google</option>
+                </select>
+                </span>
 
-                <MapView style={{width:700,height:500,marginTop:20}}
-                          mapVendor={MapViewVendor.Yandex}
+
+                <MapView style={{width:900,height:500,marginTop:20}}
+                          mapVendor={vendor}
                           lang={"ru"}
                           apiKeys={{
-                            [MapViewVendor.Yandex]: VendorKeys.VendorKeys,
+                            [MapViewVendor.Yandex]: VendorKeys.Yandex,
                             [MapViewVendor.Google]: VendorKeys.Google
                           }}
                           onClick={(event,engine,map)=>{
