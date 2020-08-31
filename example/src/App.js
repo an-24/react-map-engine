@@ -38,12 +38,6 @@ const App = () => {
                             [MapViewVendor.Yandex]: VendorKeys.Yandex,
                             [MapViewVendor.Google]: VendorKeys.Google
                           }}
-                          onClick={(event,engine,map)=>{
-                            map.removeAllMarkers();
-                            let coords = engine.extractCoordFromEvent(event);
-                            console.log("click",coords);
-                            map.addMarker(coords);
-                          }}
                           markers={[
                             {
                               coords:[58.0057,56.238],
@@ -60,6 +54,18 @@ const App = () => {
                           center={center}
                           //defaultZoom={zoom}
                           zoom={zoom}
+                          onClick={(event,engine,map)=>{
+                            map.removeAllMarkers();
+                            let coords = engine.extractCoordFromEvent(event);
+                            console.log("click",coords);
+                            map.addMarker(coords);
+                          }}
+                          onMarkerClick={(event,marker,engine,map)=>{
+                            console.log("onMarkerClick",marker);
+                          }}
+                          onClusterClick={(event,cluster,engine,map)=>{
+                            console.log("onClusterClick",cluster);
+                          }}
               />
   </div>
 }

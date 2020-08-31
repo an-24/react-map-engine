@@ -32,12 +32,6 @@ export const MapComponent = (props) => {
             zoom: defZoom,
             controls: controls
         });
-        if(props.onClick) {
-          map.events.add("click", (event)=>props.onClick(event,engine,map));
-        }
-        markers.map(m=>{
-          map.addMarker(m.coords,m.props);
-        })
         SetState({engine:engine,map:map,vendor:vendor});
       })
     }
@@ -53,10 +47,52 @@ export const MapComponent = (props) => {
     });
   }
 
+  const setClickOnMarkerEvent = ()=>{
+    switch (vendor) {
+      case MapVendor.Yandex:
+        state.map.getClusterer().events.add("objects.click",(event)=>{
+          let id = event.get('objectId');
+          let pm = state.map.createMarkerById(id);
+          props.onMarkerClick(event,pm,state.engine,state.map);
+        });
+        break;
+      case MapVendor.Google:
+        state.map.getClusterer().events.add("objects.click",(event,pm)=>{
+          props.onMarkerClick(event,pm,state.engine,state.map);
+        });
+      break;
+      default:
+    }
+  }
+
   const [state,SetState]=React.useState(()=>{
     initVendorLibrary();
     return {}
   })
+
+  React.useEffect(()=>{
+    if(state.map) {
+      if(props.onMarkerClick) {
+        setClickOnMarkerEvent();
+      }
+      if(props.onClick) {
+        state.map.events.add("click", (event)=>props.onClick(event,state.engine,state.map));
+      }
+      markers.map(m=>{
+        state.map.addMarker(m.coords,m.props);
+      })
+      if(props.onClusterClick) {
+        state.map.getClusterer().events.add("balloonopen", function (event) {
+          if(vendor==MapVendor.Yandex && !state.map.hasBalloon()) {
+            state.map.map.balloon.close();
+          }
+          let cluster = state.map.extractCluster(event);
+          props.onClusterClick(event,cluster,state.engine,state.map);
+        });
+      }
+    }
+
+  },[state]);
 
   if(props.bounds && state.engine) {
     state.map.setBounds(props.bounds);

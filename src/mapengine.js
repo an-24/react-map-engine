@@ -19,6 +19,7 @@ export const MapScriptSrc = (vendor,opt) => {
 
 export const MapEngine = function(config) {
   var googleDirectionService;
+  const mapEngine = this;
   config = config||{};
   config.mapVendor = config.mapVendor||MapVendor.Yandex;
 
@@ -440,6 +441,8 @@ export const MapEngine = function(config) {
     var self = this;
     this.mapContainerId = mapContainer;
 
+    this.deferredListiner = {};
+
     this.events = {
       xhandlers: {},
       fireX: function(eventName, args) {
@@ -468,6 +471,22 @@ export const MapEngine = function(config) {
       }
     }
 
+    this.hasBalloon = function () {
+      return !!map.balloon.getContentElement;
+    }
+
+    this.extractCluster = function(event) {
+      switch (config.mapVendor) {
+        case MapVendor.Yandex:
+          let clusterId = event.get('objectId');
+          return new CommonCluster(self.findClusterById(clusterId));
+        case MapVendor.Google:
+          return new CommonCluster(event);
+        default:
+          throwMapError();
+      }
+    }
+
     this.getClusterer = function() {
       return {
         events: {
@@ -485,7 +504,11 @@ export const MapEngine = function(config) {
                 }
                 break;
               case MapVendor.Google:
-                google.maps.event.addListener(self.markCollection, convertEventYToG(eventName), cb);
+                if (eventName.split(".").length > 1) {
+                  self.deferredListiner[eventName] = cb;
+                } else {
+                  google.maps.event.addListener(self.markCollection, convertEventYToG(eventName), cb);
+                }
                 break;
               default:
                 throwMapError();
@@ -598,7 +621,7 @@ export const MapEngine = function(config) {
 
     this.addMarker = function(coord, props) {
       switch (config.mapVendor) {
-        case MapVendor.Yandex:
+        case MapVendor.Yandex:{
           var pm;
           if (coord instanceof Array) {
             pm = new ymaps.Placemark(coord, (props && props.data) ? props.data : {}, props);
@@ -608,8 +631,9 @@ export const MapEngine = function(config) {
           let cm = new CommonMarker(pm);
           this.markCollection.add(cm.toJSON());
           return cm;
+        }
 
-        case MapVendor.Google:
+        case MapVendor.Google: {
 
           if (coord instanceof Array) {
             var place = new google.maps.LatLng(coord[0], coord[1]);
@@ -629,7 +653,16 @@ export const MapEngine = function(config) {
           }
 
           this.markCollection.addMarker(mrk);
-          return new CommonMarker(mrk);
+          let cm = new CommonMarker(mrk);
+          // check deferred listiner
+          let listiner = self.deferredListiner["objects.click"];
+          if(listiner) {
+            cm.events.add("click", (event)=>{
+              listiner.call(null,event,cm,mapEngine,self);
+            });
+          }
+          return cm;
+        }
         default:
           throwMapError();
       }
@@ -1177,17 +1210,6 @@ export const MapEngine = function(config) {
       case MapVendor.Google:
         var latLng = geo[0].geometry.location;
         return [latLng.lat(), latLng.lng()];
-      default:
-        throwMapError();
-    }
-  }
-
-  var extractCluster = function(event) {
-    switch (config.mapVendor) {
-      case MapVendor.Yandex:
-        return new CommonCluster(event.get('target'));
-      case MapVendor.Google:
-        return new CommonCluster(event);
       default:
         throwMapError();
     }
@@ -2044,7 +2066,6 @@ export const MapEngine = function(config) {
     extractCoordFromString: extractCoordFromString,
     extractFullAddress: extractFullAddress,
     extractNearestPlace: extractNearestPlace,
-    extractCluster: extractCluster,
     geocode: geocode,
     preventDefault: preventDefault,
     boundsFromPoints: boundsFromPoints,
