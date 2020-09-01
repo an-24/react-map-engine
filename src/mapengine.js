@@ -52,7 +52,7 @@ export const MapEngine = function(config) {
       }
     };
 
-    this.setContent = function(cnt, anchor) {
+    this.setContent = function(cnt, anchor,options) {
       switch (config.mapVendor) {
         case MapVendor.Yandex:
           var ball = this.balloon;
@@ -67,7 +67,8 @@ export const MapEngine = function(config) {
             ball.open(point, cnt[0].innerHTML, {
               closeButton: false,
               minWidth: 300,
-              maxWidth: 300
+              maxWidth: 300,
+              ...options
             });
             setTimeout(function() {
               $(ball.getContentElement()).find('.restpoint-details-header').parent().replaceWith(cnt);
@@ -77,7 +78,8 @@ export const MapEngine = function(config) {
             ball.open(point, cnt, {
               closeButton: false,
               minWidth: 300,
-              maxWidth: 300
+              maxWidth: 300,
+              ...options
             });
             setTimeout(function() {
               self.afterRender(ball);
@@ -91,6 +93,7 @@ export const MapEngine = function(config) {
           } else {
             cnt = $("<div style=\"padding-top:6px;padding-bottom:12px;\">").append(cnt);
           }
+          this.balloon.close();
           this.balloon.setContent(cnt[0]);
           if (anchor instanceof Array) {
             let point = new google.maps.MVCObject();

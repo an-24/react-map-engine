@@ -9,6 +9,7 @@ const App = () => {
   const [bounds,setBounds] = React.useState(null);
   const [zoom,setZoom] = React.useState(null);
   const [vendor,setVendor] = React.useState(MapViewVendor.Yandex);
+  const [state] = React.useState({});
 
   return  <div style={{padding:40}}>
                 Coords: <input onChange={(event)=>{
@@ -23,13 +24,14 @@ const App = () => {
                 </span>
                 <span style={{marginLeft:40}}>Vendor:
                 <select onChange={(event)=>{
+                          // drop ballon
+                          state.ballon=null;
                           setVendor(parseInt(event.target.value));
                         }}>
                   <option value={MapViewVendor.Yandex}>Yandex</option>
                   <option value={MapViewVendor.Google}>Google</option>
                 </select>
                 </span>
-
 
                 <MapView style={{width:900,height:500,marginTop:20}}
                           mapVendor={vendor}
@@ -62,6 +64,12 @@ const App = () => {
                           }}
                           onMarkerClick={(event,marker,engine,map)=>{
                             console.log("onMarkerClick",marker);
+                            if(!state.ballon) {
+                              state.ballon = engine.newBalloon(map);
+                            }
+                            state.ballon.setContent("Ballon coords "+marker.getPosition(),
+                                                    marker.getPosition(),
+                                                    {closeButton:true,minWidth:undefined});
                           }}
                           onClusterClick={(event,cluster,engine,map)=>{
                             console.log("onClusterClick",cluster);
